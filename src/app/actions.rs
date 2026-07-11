@@ -2520,6 +2520,32 @@ impl AppState {
         changed
     }
 
+    pub(crate) fn update_workspace_auto_name(
+        &mut self,
+        terminal_runtimes: &crate::terminal::TerminalRuntimeRegistry,
+        workspace_id: &str,
+        resolved_identity_cwd: &std::path::Path,
+        name: String,
+    ) -> bool {
+        let Some(ws_idx) = self.workspaces.iter().position(|ws| ws.id == workspace_id) else {
+            return false;
+        };
+        if self.workspaces[ws_idx]
+            .resolved_identity_cwd_from(&self.terminals, terminal_runtimes)
+            .as_deref()
+            != Some(resolved_identity_cwd)
+        {
+            return false;
+        }
+
+        let ws = &mut self.workspaces[ws_idx];
+        if ws.cached_auto_name == name {
+            return false;
+        }
+        ws.cached_auto_name = name;
+        true
+    }
+
     pub fn handle_app_event(&mut self, event: AppEvent) -> Vec<PaneStateUpdate> {
         match event {
             AppEvent::PaneDied { pane_id } => {
@@ -2742,6 +2768,7 @@ impl AppState {
             AppEvent::WorktreeAddFinished(_) => Vec::new(),
             AppEvent::WorktreeRemoveFinished(_) => Vec::new(),
             AppEvent::PluginCommandFinished { .. } => Vec::new(),
+            AppEvent::WorkspaceAutoNameResolved { .. } => Vec::new(),
         }
     }
 
