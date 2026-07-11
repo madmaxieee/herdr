@@ -2085,6 +2085,7 @@ mod tests {
                 branch: Some("render-dirty-test".into()),
                 ahead_behind: Some((1, 0)),
                 space: None,
+                auto_name: "one".to_string(),
             }],
             cache_updates: Vec::new(),
         });
@@ -5147,7 +5148,7 @@ last_pane = "prefix+tab"
             Some(crate::terminal_theme::RgbColor {
                 r: 0x12,
                 g: 0x34,
-                b: 0x56,
+                b: 0x56
             })
         );
     }
