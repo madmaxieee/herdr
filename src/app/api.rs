@@ -1782,10 +1782,12 @@ mod tests {
             std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false)),
         )
         .unwrap();
-        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(2);
-        while runtime.cwd() != Some(live_cwd.clone()) && std::time::Instant::now() < deadline {
-            tokio::time::sleep(std::time::Duration::from_millis(10)).await;
-        }
+        // Apply the shell's CWD report before registering a runtime whose process-CWD
+        // observation is independent from (and may lag) that report.
+        app.handle_internal_event(AppEvent::TerminalCwdReported {
+            pane_id: root,
+            cwd: live_cwd.clone(),
+        });
         app.terminal_runtimes.insert(terminal_id, runtime);
 
         app.handle_internal_event(AppEvent::StateChanged {
@@ -1874,10 +1876,12 @@ mod tests {
             std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false)),
         )
         .unwrap();
-        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(2);
-        while runtime.cwd() != Some(live_cwd.clone()) && std::time::Instant::now() < deadline {
-            tokio::time::sleep(std::time::Duration::from_millis(10)).await;
-        }
+        // Apply the shell's CWD report before registering a runtime whose process-CWD
+        // observation is independent from (and may lag) that report.
+        app.handle_internal_event(AppEvent::TerminalCwdReported {
+            pane_id: root,
+            cwd: live_cwd.clone(),
+        });
         app.terminal_runtimes.insert(terminal_id, runtime);
 
         app.handle_internal_event(AppEvent::StateChanged {
